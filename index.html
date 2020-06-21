@@ -1,11 +1,48 @@
+<!DOCTYPE html>
 <html>
 
  <head>
   <title>アイマス曲数計測</title>
+  <script src="//ajax.googleapis.com/ajax/libs/jquery/1.10.1/jquery.min.js"></script>
+  <script>
+  $(function() {
+    $.getJSON("./songs.json" , function(data) {
+      var
+        songobj = $("table#songs tbody"),
+        len = data.length;
+  
+      for(var i = 0; i < len; i++) {
+        songobj.append("<tr id=" + i + "><td align='center'>" + data[i].title + "</td><td align='center'>" + data[i].work + "</td></tr>");
+        songobj.append("<tr id=" + i + "><td colspan='2' align='center'>" + '<input name="select" type="radio" value="known"> 知ってる <input name="select" type="radio" value="unknown"> 知らない' + "</td></tr>");
+      }
+    });
+  });
+  </script>
  </head>
 
  <body>
-  Hello, world
+     <h1>知ってるアイマス曲計測</h1>
+     <h2>タイトル</h2>
+     <!-- <input type="checkbox" name="work" value="765AS"> 765AS </br>
+    <input type="checkbox" name="work" value="dere" > シンデレラガールズ </br>
+    <input type="checkbox" name="work" value="milli" > ミリオンライブ </br>
+    <input type="checkbox" name="work" value="sidem" > SideM </br>
+    <input type="checkbox" name="work" value="shiny" > シャイニーカラーズ </br>
+    <input type="checkbox" name="work" value="xeno" > ゼノグラシア </br>
+    <input type="checkbox" name="work" value="milli" > ミリオンライブ </br>
+    <input type="checkbox" name="work" value="redio" > ラジオ </br>
+    <input type="checkbox" name="work" value="kr" > KR </br>
+  <form action=""></form> -->
+  <table id="songs">
+        <thead>
+                <tr>
+                    <th>曲名</th>
+                    <th>作品</th>
+                </tr>
+            </thead>
+            <tbody>
+            </tbody>
+  </table>
  </body>
 
 </html>
