@@ -50,6 +50,27 @@
             document.getElementById("sum").textContent = num_of_song;
         }
 
+        function allSelectRadioButton(select_value) {
+            var forms = document.getElementsByName("choise");
+            for (let i = 0; i < forms.length; i++) {
+                const buttons = forms[i];
+                var selected = -1;
+                if (select_value) {
+                    selected = 0;
+                    incrementNumber();
+                } else {
+                    selected = 1;
+                    decrementNumber();
+                }
+                buttons.select[selected].checked = true;
+            }
+        }
+
+        function controlRadio() {
+            var allSelectCheckbox = document.getElementsByName("allSelect");
+            allSelectRadioButton(allSelectCheckbox[0].checked);
+        }
+
     </script>
     <style>
         #number {
@@ -83,7 +104,8 @@
     <input type="checkbox" name="work" value="redio" > ラジオ </br>
     <input type="checkbox" name="work" value="kr" > KR </br>
   <form action=""></form> -->
-    <h2>曲名一覧</h2>
+    <h2>曲名一覧(2020年6月22日時点)</h2>
+    <input type="checkbox" name="allSelect" onchange="controlRadio()">全て知ってる(試験機能:重いかも)
     <table id="songs">
         <thead>
             <tr>
