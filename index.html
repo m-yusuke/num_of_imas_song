@@ -1,29 +1,79 @@
 <!DOCTYPE html>
 <html>
 
- <head>
-  <title>アイマス曲数計測</title>
-  <script src="//ajax.googleapis.com/ajax/libs/jquery/1.10.1/jquery.min.js"></script>
-  <script>
-  $(function() {
-    $.getJSON("./songs.json" , function(data) {
-      var
-        songobj = $("table#songs tbody"),
-        len = data.length;
-  
-      for(var i = 0; i < len; i++) {
-        songobj.append("<tr id=" + i + "><td align='center'>" + data[i].title + "</td><td align='center'>" + data[i].work + "</td></tr>");
-        songobj.append("<tr id=" + i + "><td colspan='2' align='center'>" + '<input name="select" type="radio" value="known"> 知ってる <input name="select" type="radio" value="unknown"> 知らない' + "</td></tr>");
-      }
-    });
-  });
-  </script>
- </head>
+<head>
+    <title>アイマス曲数計測</title>
+    <script src="//ajax.googleapis.com/ajax/libs/jquery/1.10.1/jquery.min.js"></script>
+    <script>
+        var num_of_song = 0;
+        var num_of_knownsong = 0;
+        var rate_of_known = 0;
+        $(window).load(function () {
+            document.getElementById("number").textContent = num_of_knownsong;
+            document.getElementById("rate").textContent = rate_of_known;
+            document.getElementById("sum").textContent = num_of_song;
+        });
 
- <body>
-     <h1>知ってるアイマス曲計測</h1>
-     <h2>タイトル</h2>
-     <!-- <input type="checkbox" name="work" value="765AS"> 765AS </br>
+        $(function () {
+            $.getJSON("./songs.json", function (data) {
+                var
+                    songobj = $("table#songs tbody"),
+                    len = data.length;
+
+                num_of_song = len;
+
+                for (var i = 0; i < len; i = (i + 1) | 0) {
+                    songobj.append("<tr id=" + i + "><td>" + data[i].title + "</td><td>" + data[i].work + "</td></tr>");
+                    songobj.append("<tr id=" + i + "><td colspan='2'>" + '<form name="choise"><input name="select" type="radio" value="known" onChange="incrementNumber()"> 知ってる <input name="select" type="radio" value="unknown" checked="checked" onChange="decrementNumber()"> 知らない</form>' + "</td></tr>");
+                }
+            });
+
+        });
+
+        function incrementNumber() {
+            num_of_knownsong++;
+            rate_of_known = num_of_knownsong / num_of_song * 100;
+            rate_of_known = Math.round(rate_of_known * 100) / 100;
+            refreshNumber();
+        }
+
+        function decrementNumber() {
+            num_of_knownsong--;
+            rate_of_known = num_of_knownsong / num_of_song * 100;
+            rate_of_known = Math.round(rate_of_known * 100) / 100;
+            refreshNumber();
+        }
+
+        function refreshNumber() {
+            document.getElementById("number").textContent = num_of_knownsong;
+            document.getElementById("rate").textContent = rate_of_known;
+            document.getElementById("sum").textContent = num_of_song;
+        }
+
+    </script>
+    <style>
+        #number {
+            font-size: 300%;
+            font-weight: bold;
+            display: inline;
+        }
+
+        #rate {
+            font-size: 300%;
+            font-weight: bold;
+            display: inline;
+        }
+
+        #sum {
+            display: inline;
+        }
+    </style>
+</head>
+
+<body>
+    <h1>知ってるアイマス曲数計測</h1>
+    <!-- <h2>タイトル</h2> -->
+    <!-- <input type="checkbox" name="work" value="765AS"> 765AS </br>
     <input type="checkbox" name="work" value="dere" > シンデレラガールズ </br>
     <input type="checkbox" name="work" value="milli" > ミリオンライブ </br>
     <input type="checkbox" name="work" value="sidem" > SideM </br>
@@ -33,16 +83,24 @@
     <input type="checkbox" name="work" value="redio" > ラジオ </br>
     <input type="checkbox" name="work" value="kr" > KR </br>
   <form action=""></form> -->
-  <table id="songs">
+    <h2>曲名一覧</h2>
+    <table id="songs">
         <thead>
-                <tr>
-                    <th>曲名</th>
-                    <th>作品</th>
-                </tr>
-            </thead>
-            <tbody>
-            </tbody>
-  </table>
- </body>
+            <tr>
+                <th align="left">曲名</th>
+                <th align="left">作品</th>
+            </tr>
+        </thead>
+        <tbody>
+        </tbody>
+    </table>
+
+    <h2>結果</h2>
+    知っている曲数は<br>
+    <div id="number"></div>/<div id="sum">0</div>
+    で<br>
+    全体の<br>
+    <div id="rate"></div>％
+</body>
 
 </html>
