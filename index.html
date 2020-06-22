@@ -8,6 +8,8 @@
         var num_of_song = 0;
         var num_of_knownsong = 0;
         var rate_of_known = 0;
+        var works_sum = {};
+        var works_each = {};
         $(window).load(function () {
             document.getElementById("number").textContent = num_of_knownsong;
             document.getElementById("rate").textContent = rate_of_known;
@@ -23,21 +25,46 @@
                 num_of_song = len;
 
                 for (var i = 0; i < len; i = (i + 1) | 0) {
-                    songobj.append("<tr id=" + i + "><td>" + data[i].title + "</td><td>" + data[i].work + "</td></tr>");
-                    songobj.append("<tr id=" + i + "><td colspan='2'>" + '<form name="choise"><input name="select" type="radio" value="known" onChange="incrementNumber()"> 知ってる <input name="select" type="radio" value="unknown" checked="checked" onChange="decrementNumber()"> 知らない</form>' + "</td></tr>");
+                    if (!works_sum[data[i].work]) {
+                        var detail_id = "work-" + data[i].work.replace(/ /g, '');
+                        works_sum[data[i].work] = [0, detail_id];
+                        works_each[data[i].work] = [0, detail_id];
+                    }
+                    works_sum[data[i].work][0]++;
+                    songobj.append("<tr id=" + i + "><td name='title'>" + data[i].title + "</td><td name='work'>" + data[i].work + "</td></tr>");
+                    songobj.append("<tr><td name='button' colspan='2'>" + '<form name="choise"><input name="select" id="' + i + '-known" type="radio" value="known" onChange="incrementNumber(this)"> 知ってる <input name="select" id="' + i + '-unknown" type="radio" value="unknown" checked="checked" onChange="decrementNumber(this)"> 知らない</form>' + "</td></tr>");
                 }
+
+                var detailobj = $("div#detail")
+
+                for (const work in works_sum) {
+                    if (works_sum.hasOwnProperty(work)) {
+                        const sum = works_sum[work][0];
+                        var each = works_each[work][0]
+                        detailobj.append(work + "<br>");
+                        var detail_id = works_sum[work][1];
+                        //works_ids.push(detail_id);
+                        detailobj.append(`<div class=detail-title id="${detail_id}">${each}</div>/${sum}<br>`);
+                    }
+                }
+
             });
 
         });
 
-        function incrementNumber() {
+        function incrementNumber(obj) {
+            //console.log(obj);
+            var workname = document.getElementById(obj.id.replace(/(.*)-[a-z]+/g, '$1')).children[1].innerHTML;
+            works_each[workname][0]++;
             num_of_knownsong++;
             rate_of_known = num_of_knownsong / num_of_song * 100;
             rate_of_known = Math.round(rate_of_known * 100) / 100;
             refreshNumber();
         }
 
-        function decrementNumber() {
+        function decrementNumber(obj) {
+            var workname = document.getElementById(obj.id.replace(/(.*)-[a-z]+/g, '$1')).children[1].innerHTML;
+            works_each[workname][0]--;
             num_of_knownsong--;
             rate_of_known = num_of_knownsong / num_of_song * 100;
             rate_of_known = Math.round(rate_of_known * 100) / 100;
@@ -48,16 +75,23 @@
             document.getElementById("number").textContent = num_of_knownsong;
             document.getElementById("rate").textContent = rate_of_known;
             document.getElementById("sum").textContent = num_of_song;
+            for (const work_name in works_each) {
+                if (works_each.hasOwnProperty(work_name)) {
+                    const work_id = works_each[work_name][1];
+                    document.getElementById(work_id).textContent = works_each[work_name][0];
+                }
+            }
         }
 
         function allSelectRadioButton(select_value) {
+            // メンテナンス中
             var forms = document.getElementsByName("choise");
             for (let i = 0; i < forms.length; i++) {
                 const buttons = forms[i];
                 var selected = -1;
                 if (select_value) {
                     selected = 0;
-                    incrementNumber();
+                    incrementNumber(this);
                 } else {
                     selected = 1;
                     decrementNumber();
@@ -69,6 +103,10 @@
         function controlRadio() {
             var allSelectCheckbox = document.getElementsByName("allSelect");
             allSelectRadioButton(allSelectCheckbox[0].checked);
+        }
+
+        function checkWorkDetail(work) {
+
         }
 
     </script>
@@ -88,6 +126,12 @@
         #sum {
             display: inline;
         }
+
+        .detail-title {
+            font-size: 150%;
+            display: inline;
+            font-weight: bold;
+        }
     </style>
 </head>
 
@@ -105,7 +149,7 @@
     <input type="checkbox" name="work" value="kr" > KR </br>
   <form action=""></form> -->
     <h2>曲名一覧(2020年6月22日時点)</h2>
-    <input type="checkbox" name="allSelect" onchange="controlRadio()">全て知ってる(試験機能:重いかも)
+    <!-- <input type="checkbox" name="allSelect" onchange="controlRadio()">全て知ってる(試験機能:重いかも) -->
     <table id="songs">
         <thead>
             <tr>
@@ -118,11 +162,13 @@
     </table>
 
     <h2>結果</h2>
-    知っている曲数は<br>
+    知っているアイマス曲は<br>
     <div id="number"></div>/<div id="sum">0</div>
     で<br>
     全体の<br>
-    <div id="rate"></div>％
+    <div id="rate"></div>％<br>
+    内訳
+    <div id="detail"></div>
 </body>
 
 </html>
