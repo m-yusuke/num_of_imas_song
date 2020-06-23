@@ -43,7 +43,6 @@
                         var each = works_each[work][0]
                         detailobj.append(work + "<br>");
                         var detail_id = works_sum[work][1];
-                        //works_ids.push(detail_id);
                         detailobj.append(`<div class=detail-title id="${detail_id}">${each}</div>/${sum}<br>`);
                     }
                 }
@@ -53,7 +52,6 @@
         });
 
         function incrementNumber(obj) {
-            //console.log(obj);
             var workname = document.getElementById(obj.id.replace(/(.*)-[a-z]+/g, '$1')).children[1].innerHTML;
             works_each[workname][0]++;
             num_of_knownsong++;
@@ -75,38 +73,58 @@
             document.getElementById("number").textContent = num_of_knownsong;
             document.getElementById("rate").textContent = rate_of_known;
             document.getElementById("sum").textContent = num_of_song;
+
+            setShareButton(`知っているアイマス曲は${num_of_knownsong}/${num_of_song}で全体の${rate_of_known}％です\nアイマス曲数計測`);
+
             for (const work_name in works_each) {
                 if (works_each.hasOwnProperty(work_name)) {
-                    const work_id = works_each[work_name][1];
+                    const work_id = works_sum[work_name][1];
                     document.getElementById(work_id).textContent = works_each[work_name][0];
                 }
             }
         }
 
-        function allSelectRadioButton(select_value) {
-            // メンテナンス中
+        function allSelectRadioButton(obj) {
             var forms = document.getElementsByName("choise");
+            var selected = -1;
+            if (obj.checked) {
+                selected = 0;
+                num_of_knownsong = num_of_song;
+                for (const work_name in works_each) {
+                    if (works_each.hasOwnProperty(work_name)) {
+                        works_each[work_name][0] = works_sum[work_name][0];
+                    }
+                }
+                rate_of_known = 100;
+            } else {
+                selected = 1;
+                num_of_knownsong = 0;
+                for (const work_name in works_each) {
+                    if (works_each.hasOwnProperty(work_name)) {
+                        works_each[work_name][0] = 0;
+                    }
+                }
+                rate_of_known = 0;
+            }
             for (let i = 0; i < forms.length; i++) {
                 const buttons = forms[i];
-                var selected = -1;
-                if (select_value) {
-                    selected = 0;
-                    incrementNumber(this);
-                } else {
-                    selected = 1;
-                    decrementNumber();
-                }
                 buttons.select[selected].checked = true;
             }
+            refreshNumber();
         }
 
-        function controlRadio() {
-            var allSelectCheckbox = document.getElementsByName("allSelect");
-            allSelectRadioButton(allSelectCheckbox[0].checked);
-        }
-
-        function checkWorkDetail(work) {
-
+        function setShareButton(text) {
+            $('#tweet-container iframe').remove();
+            var tweetBtn = $('<a></a>')
+                .addClass('twitter-share-button')
+                .attr('href', 'https://twitter.com/share')
+                .attr('data-text', text)
+                .attr('data-url', 'https://m-yusuke.github.io/num_of_imas_song/')
+                .attr('data-size', 'large')
+                .attr('data-lang', 'ja')
+                .attr('data-hashtags', 'test');
+            $('#tweet-container').append(tweetBtn);
+            twttr.widgets.load();
         }
 
     </script>
@@ -149,7 +167,7 @@
     <input type="checkbox" name="work" value="kr" > KR </br>
   <form action=""></form> -->
     <h2>曲名一覧(2020年6月22日時点)</h2>
-    <!-- <input type="checkbox" name="allSelect" onchange="controlRadio()">全て知ってる(試験機能:重いかも) -->
+    <input type="checkbox" name="allSelect" onchange="allSelectRadioButton(this)">全て知ってる(試験機能:重いかも)
     <table id="songs">
         <thead>
             <tr>
@@ -167,6 +185,12 @@
     で<br>
     全体の<br>
     <div id="rate"></div>％<br>
+    <div id="tweet-container"><a class="twitter-share-button" href="https://twitter.com/share"
+            data-url="https://m-yusuke.github.io/num_of_imas_song/" data-hashtags="test" data-size="large"
+            data-lang="ja">Tweet</a>
+        <script>!function (d, s, id) { var js, fjs = d.getElementsByTagName(s)[0]; if (!d.getElementById(id)) { js = d.createElement(s); js.id = id; js.src = "//platform.twitter.com/widgets.js"; fjs.parentNode.insertBefore(js, fjs); } }(document, "script", "twitter-wjs");</script>
+    </div>
+    <script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
     内訳
     <div id="detail"></div>
 </body>
